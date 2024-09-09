@@ -22,6 +22,6 @@
         ignore_errors: yes
         register: sql_result 
 
-    - name: print output
+     - name: print output
       ansible.builtin.debug:
       msg: "{{sql_result}}"
