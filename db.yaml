@@ -1,27 +1,67 @@
-- name: configuare the db server
+# - name: configuare the db server
+#   hosts: db
+#   become: yes
+#   tasks:
+#     - name: install my sql server
+#       ansible.builtin.dnf:
+#         name: mysql-server
+#         state: latest
+#     - name: sql start 
+#       ansible.builtin.service:
+#         name: mysqld
+#         state: started
+#         enabled: yes
+#       ##check db password is already setup or not 
+
+#     - name: check DB connection
+#       community.mysql.mysql_info:
+#         login_user: root
+#         login_password: ExpenseApp@1
+#         login_host: 172.31.28.58
+#         filter: version
+#         ignore_errors: yes
+#         register: sql_result 
+
+#     - name: print output
+#       ansible.builtin.debug:
+#       msg: "{{sql_result}}"
+
+
+- name: configure the db 
   hosts: db
   become: yes
   tasks:
-    - name: install my sql server
-      ansible.builtin.dnf:
-        name: mysql-server
-        state: latest
-    - name: sql start 
-      ansible.builtin.service:
-        name: mysqld
-        state: started
-        enabled: yes
-      ##check db password is already setup or not 
+  - name: install my sql server
+    ansible.builtin.dnf:
+      name: mysql-server
+      state: installed
+  - name: start the mysql
+    ansible.builtin.service:
+      name: mysqld
+      state: started
+      enabled: yes 
 
-    - name: check DB connection
-      community.mysql.mysql_info:
-        login_user: root
-        login_password: ExpenseApp@1
-        login_host: 172.31.28.58
-        filter: version
-        ignore_errors: yes
-        register: sql_result 
-
-     - name: print output
-      ansible.builtin.debug:
-      msg: "{{sql_result}}"
+  #install python dependies to connect mysql 
+  - name: install pip
+    ansible.builtin.pip:
+      name: 
+      - PyMySQL
+      - cryptography
+      executable: pip3.9 #check python version 
+  #check root password set or not 
+  - name: check db connection
+    community.mysql.mysql_info:
+      login_user: root
+      login_password: ExpenseApp@1
+      login_host: db
+      filter: version
+      ignore_errors: yes
+      register: sql_result 
+    #ansible is developed in python . know we are connecting to sql throw 
+    #ansible which is developed by python . so it was expecting some dependenci to 
+    #connect to sql server . python pip dependency need to install .
+    #pip install community.mysql
+    
+    ##set up root password 
+  - name: set up root password
+    ansible.builtin.command: mysql_secure_installation --set-root-pass ExpenseApp@1
