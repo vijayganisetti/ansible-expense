@@ -2,7 +2,8 @@
   hosts: db
   become: yes
   vars:
-    login_host: db.vijayganisetti.online
+    login_host: 172.31.223.6
+
   vars_prompt:
   - name: mysql_root_password
     prompt: please enter MySQL root password
